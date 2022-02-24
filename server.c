@@ -12,29 +12,99 @@
 
 #include "server.h"
 
+#include <stdio.h>
+
+void	print_byte_as_binary(char c)
+{
+	int bit_offset = 0;
+	char bit;
+
+	ft_printf("<0b");
+	while (bit_offset < 8)
+	{
+		bit = (c >> (7 - bit_offset)) & 1;
+		ft_printf("%d", bit);
+		bit_offset++;
+	}
+	ft_printf(">");
+}
+
 static void	signal_handler(int sig)
 {
-	static unsigned int	char_buff;
+	static unsigned char	char_buff[7];
+	static int	buff_i;
 	static int	bit_received_count;
+	static int	char_width;
 
 	if (sig == SIGUSR1)
 	{
-		char_buff = (char_buff << 1) | 1;
+		char_buff[buff_i] = (char_buff[buff_i] << 1) | 1;
 	}
 	else if (sig == SIGUSR2)
 	{
-		char_buff = (char_buff << 1) | 0;
+		char_buff[buff_i] = (char_buff[buff_i] << 1) | 0;
 	}
 	bit_received_count++;
 
-	if (bit_received_count == 32)
+	if (bit_received_count == 8)
 	{
-		ft_printf("the int value is: <%32d>\n", char_buff);
-		ft_printf("%c", char_buff);
+		if (char_width == 0)
+		{
+			if (char_buff[buff_i] <= 0x7F)
+			{
+				char_width = 1;
+			}
+			else if (char_buff[buff_i] >= 0xC0 && char_buff[buff_i] <= 0xDF)
+			{
+				char_width = 2;
+			}
+			else if (char_buff[buff_i] >= 0xE0 && char_buff[buff_i] <= 0xEF)
+			{
+				char_width = 3;
+			}
+			else if (char_buff[buff_i] >= 0xF0 && char_buff[buff_i] <= 0xF7)
+			{
+				char_width = 4;
+			}
+			else if (char_buff[buff_i] >= 0xF8 && char_buff[buff_i] <= 0xFB)
+			{
+				char_width = 5;
+			}
+			else if (char_buff[buff_i] >= 0xFC && char_buff[buff_i] <= 0xFD)
+			{
+				char_width = 6;
+			}
+			else
+			{
+				// Invalid first byte when decoding as UTF-8
+				// Change to rplacement character (�)
+				char_width = 3;
+				char_buff[0] = 0xEF;
+				char_buff[1] = 0xBF;
+				char_buff[2] = 0xBD;
+			}
+		}
+		//maybe handle the rest of the erroring out if continuing characters are not continuing characters
+
+		buff_i++;
 		bit_received_count = 0;
-		char_buff = 0;
+		char_buff[buff_i] = '\0';
+		// ft_printf("DEBUG: buff_i: %d    char_width: %d\n", buff_i, char_width);
+		if (buff_i == char_width)
+		{
+			// ft_printf("hex: %x %x %x %x %x %x\n", char_buff[0], char_buff[1], char_buff[2], char_buff[3], char_buff[4], char_buff[5]);
+			// ft_printf("printing char %c\n", char_buff[0]);
+			ft_printf("%s", char_buff);
+			while(buff_i > 0)
+			{
+				buff_i--;
+				char_buff[buff_i] = 0;
+			}
+			// char_buff[buff_i] = 0;
+			char_width = 0;
+		}
 	}
-	// ft_printf("the int at this time is %d\n", char_buff);
+
 	return ;
 }
 

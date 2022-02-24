@@ -12,16 +12,16 @@
 
 #include "client.h"
 
-static int	send_char(pid_t target_pid, int c)
+static int	send_char(pid_t target_pid, char c)
 {
 	char	bit;
 	int		bit_offset;
 
-	bit_offset = 31;
+	bit_offset = 0;
 	ft_printf("Sending char: <0b");
-	while (bit_offset >= 0)
+	while (bit_offset < 8)
 	{
-		bit = (c >> bit_offset) & 1;
+		bit = (c >> (7 - bit_offset)) & 1;
 		ft_printf("%d", bit);
 		if (bit == 1)
 		{
@@ -31,7 +31,7 @@ static int	send_char(pid_t target_pid, int c)
 		{
 			kill(target_pid, SIGUSR2);
 		}
-		bit_offset--;
+		bit_offset++;
 		usleep(10);
 	}
 	ft_printf(">\n");
@@ -68,6 +68,7 @@ int	main(int argc, char **argv)
 		ft_printf("Invalid PID. Please try again.\n");
 		return (1);
 	}
+	ft_printf("Sending string: <%s>\n", argv[2]);
 	send_string(target_pid, argv[2]);
 	ft_printf("Message sent.\n");
 	return (0);
