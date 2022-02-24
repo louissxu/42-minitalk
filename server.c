@@ -89,18 +89,14 @@ static void	signal_handler(int sig)
 		buff_i++;
 		bit_received_count = 0;
 		char_buff[buff_i] = '\0';
-		// ft_printf("DEBUG: buff_i: %d    char_width: %d\n", buff_i, char_width);
 		if (buff_i == char_width)
 		{
-			// ft_printf("hex: %x %x %x %x %x %x\n", char_buff[0], char_buff[1], char_buff[2], char_buff[3], char_buff[4], char_buff[5]);
-			// ft_printf("printing char %c\n", char_buff[0]);
 			ft_printf("%s", char_buff);
 			while(buff_i > 0)
 			{
 				buff_i--;
 				char_buff[buff_i] = 0;
 			}
-			// char_buff[buff_i] = 0;
 			char_width = 0;
 		}
 	}
@@ -116,8 +112,6 @@ int	main(void)
 	ft_printf("---- Minitalk ----\n");
 	ft_printf("Server is running. PID is: %d\n", pid);
 	ft_printf("Waiting for message...\n");
-	// char a[4] = "\u1231";
-	// ft_printf("%s", a);
 	signal(SIGUSR1, signal_handler);
 	signal(SIGUSR2, signal_handler);
 	while (1)

@@ -18,11 +18,9 @@ static int	send_char(pid_t target_pid, char c)
 	int		bit_offset;
 
 	bit_offset = 0;
-	ft_printf("Sending char: <0b");
 	while (bit_offset < 8)
 	{
 		bit = (c >> (7 - bit_offset)) & 1;
-		ft_printf("%d", bit);
 		if (bit == 1)
 		{
 			kill(target_pid, SIGUSR1);
@@ -32,9 +30,8 @@ static int	send_char(pid_t target_pid, char c)
 			kill(target_pid, SIGUSR2);
 		}
 		bit_offset++;
-		usleep(10);
+		usleep(50);
 	}
-	ft_printf(">\n");
 	target_pid++;
 	return (0);
 }
