@@ -12,12 +12,12 @@
 
 #include "client.h"
 
-static int	send_char(pid_t target_pid, char c)
+static int	send_char(pid_t target_pid, int c)
 {
 	char	bit;
 	int		bit_offset;
 
-	bit_offset = 7;
+	bit_offset = 31;
 	ft_printf("Sending char: <0b");
 	while (bit_offset >= 0)
 	{
@@ -46,7 +46,7 @@ static int	send_string(pid_t target_pid, char *str)
 	i = 0;
 	while (str[i])
 	{
-		send_char(target_pid, str[i]);
+		send_char(target_pid, (int)str[i]);
 		i++;
 	}
 	send_char(target_pid, '\n');
