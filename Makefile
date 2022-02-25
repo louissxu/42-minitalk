@@ -3,11 +3,11 @@ CFLAGS = -Wall -Wextra -Werror
 
 all: server client
 
-server: server.o libft
+server: server.o helpers.o libft
 	@echo "Compiling server.o"
 	$(CC) $(CFLAGS) -I . -L libft -lft $< -o $@ 
 
-client: client.o libft
+client: client.o helpers.o libft
 	@echo "Compiling client.o"
 	$(CC) $(CFLAGS) -I . -L libft -lft $< -o $@
 

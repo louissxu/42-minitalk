@@ -14,6 +14,7 @@
 # define SERVER_H
 
 # include "libft/includes/libft.h"
+# include "helpers.c"
 
 # include <unistd.h>
 # include <signal.h>
