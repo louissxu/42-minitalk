@@ -76,7 +76,6 @@ static void byte_handler(unsigned char byte)
 	if (byte == 0xFF)
 	{
 		ft_printf("> Message sent successfully!\n");
-		ft_printf("----------\n");
 	}
 	exit(0);
 }
@@ -124,22 +123,21 @@ int	main(int argc, char **argv)
 	}
 	client_pid = getpid();
 
-	ft_printf("---- Minitalk Client ----\n");
-	ft_printf("> Client PID is: %d\n", client_pid);
-	ft_printf("> Server PID is: %d\n", target_pid);
-	ft_printf("> Sending message: ");
+	ft_printf("------ Minitalk Client ------\n");
+	ft_printf("| Client PID is: %-10d |\n", client_pid);
+	ft_printf("| Server PID is: %-10d |\n", target_pid);
+	ft_printf("-----------------------------\n");
+	ft_printf("> Sending message:\n");
 	ft_printf("%s\n", argv[2]);
 
 	signal(SIGUSR1, signal_handler);
 	signal(SIGUSR2, signal_handler);
 
-	send_message(client_pid, target_pid, argv[2]);
 	ft_printf("> Waiting for acknowledgement from server...\n");
-
-	while (1)
-	{
-		sleep(1);
-	}
+	send_message(client_pid, target_pid, argv[2]);
+	
+	sleep(1);
+	ft_printf("> NO RESPONSE RECEIVED. LIKELY MESSAGE FAILURE\n");
 	//ft_printf("Message sent.\n");
-	return (0);
+	return (1);
 }
