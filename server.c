@@ -17,6 +17,8 @@
 // REMVOVE ME !!!!!!!
 // REMVOVE ME !!!!!!!
 
+pid_t	global_pid = 0;
+
 void	print_byte_as_binary(char c)
 {
 	int bit_offset = 0;
@@ -34,8 +36,8 @@ void	print_byte_as_binary(char c)
 
 static void end_of_message(pid_t source_pid)
 {
-	ft_printf("\n");
 	usleep(100);
+	ft_printf("\n");
 	send_char(source_pid, 0xFF);
 }
 
@@ -47,9 +49,9 @@ static void byte_handler(unsigned char byte)
 	static int	byte_number;
 	static pid_t	source_pid;
 
-	ft_printf("Incoming byte: ");
-	print_byte_as_binary(byte);
-	ft_printf("\n");
+	// ft_printf("Incoming byte: ");
+	// print_byte_as_binary(byte);
+	// ft_printf("\n");
 
 	if (byte_number == 0)
 	{
@@ -69,6 +71,7 @@ static void byte_handler(unsigned char byte)
 		{
 			ft_printf("> Incoming message from PID: %i\n", source_pid);
 		}
+		global_pid = source_pid;
 		byte_number++;
 		return ;
 	}
@@ -131,6 +134,7 @@ static void byte_handler(unsigned char byte)
 				char_buff[buff_i] = 0;
 			}
 			char_width = 0;
+			global_pid = 0;
 		}
 	}
 
@@ -151,6 +155,10 @@ static void	signal_handler(int sig)
 		byte = (byte << 1) | 0x00;
 	}
 	bit_received_count++;
+	if (global_pid != 0)
+	{
+		kill(global_pid, SIGUSR2);
+	}
 	
 	if (bit_received_count == 8)
 	{

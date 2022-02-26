@@ -3,6 +3,8 @@ CFLAGS = -Wall -Wextra -Werror
 
 all: server client
 
+A = Fix makefile not recompiling helpers
+
 server: server.o helpers.o libft
 	@echo "Compiling server.o"
 	$(CC) $(CFLAGS) -I . -L libft -lft $< -o $@ 
