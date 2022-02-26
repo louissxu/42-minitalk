@@ -68,7 +68,7 @@ void	print_byte_as_binary(char c)
 
 static void end_of_message(pid_t source_pid)
 {
-	ft_printf("\n");
+	ft_printf("\nEND OF MESSAGE\n");
 	send_char(source_pid, 0xFF);
 	global_pid = 0;
 }
@@ -83,14 +83,16 @@ static void byte_handler(unsigned char byte)
 
 	if (byte_number == 0)
 	{
-		if (byte != 0xFF)
+		if (byte != 0x00)
 		{
+			//but maybe do some sort of error handling. like jump to byte_number > -1 so wait for end or something
 			return;
 		}
 		source_pid = 0;
 		byte_number++;
 		return ;
 	}
+
 	if (byte_number >= 1 && byte_number <= 4)
 	{		
 		source_pid = source_pid << 8;
@@ -171,7 +173,13 @@ static void byte_handler(unsigned char byte)
 static void	signal_handler(int sig)
 {
 	static unsigned char	byte;
+	static unsigned char	previous_byte;
 	static int	bit_received_count;
+
+	if (previous_byte == 0xFF && sig == SIGUSR1)
+	{
+		return;
+	}
 
 	if (sig == SIGUSR1)
 	{
@@ -193,8 +201,9 @@ static void	signal_handler(int sig)
 		kill(global_pid, SIGUSR2);
 	}
 	
-	if (bit_received_count == 8)
+	if (bit_received_count >= 8)
 	{
+		previous_byte = byte;
 		byte_handler(byte);
 		// ft_printf("byte received. Byte is:");
 		// print_byte_as_binary(byte);

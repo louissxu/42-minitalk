@@ -57,7 +57,7 @@ int	send_string(pid_t target_pid, char *str)
 // Ref: Converting int to bytes https://stackoverflow.com/a/3784478/9160572
 static int	send_message(pid_t source_pid, pid_t target_pid, char *str)
 {
-	send_char(target_pid, 0xFF);
+	send_char(target_pid, 0x00);
 	
 	send_char(target_pid, (source_pid >> 24) & 0xFF);
 	send_char(target_pid, (source_pid >> 16) & 0xFF);
@@ -65,6 +65,7 @@ static int	send_message(pid_t source_pid, pid_t target_pid, char *str)
 	send_char(target_pid, source_pid & 0xFF);
 
 	send_string(target_pid, str);
+	send_char(target_pid, 0xFF);
 	send_char(target_pid, 0xFF);
 
 	return (0);
