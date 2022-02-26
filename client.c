@@ -33,7 +33,7 @@ int	send_char(pid_t target_pid, char c)
 		// ft_printf("%i", (int)bit);
 		bit_offset++;
 		usleep(10000);
-		usleep(1000);
+		usleep(100);
 	}
 	// ft_printf(">\n");
 	target_pid++;
@@ -87,13 +87,11 @@ static void	signal_handler(int sig)
 
 	if (sig == SIGUSR1)
 	{
-		ft_printf("sig1 received \n");
 		byte = (byte << 1) | 0x01;
 		bit_received_count++;
 	}
 	else if (sig == SIGUSR2)
 	{
-		ft_printf("sig2 received \n");
 		// byte = (byte << 1) | 0x00;
 		byte = 0x00;
 		bit_received_count = 0;

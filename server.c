@@ -20,7 +20,6 @@ int	send_char(pid_t target_pid, char c)
 	int		bit_offset;
 
 	bit_offset = 0;
-	// ft_printf("Sending byte: <0b");
 	while (bit_offset < 8)
 	{
 		bit = (c >> (7 - bit_offset)) & 1;
@@ -32,11 +31,9 @@ int	send_char(pid_t target_pid, char c)
 		{
 			kill(target_pid, SIGUSR2);
 		}
-		// ft_printf("%i", (int)bit);
 		bit_offset++;
-		usleep(5000);
+		usleep(100);
 	}
-	// ft_printf(">\n");
 	target_pid++;
 	return (0);
 }
@@ -71,7 +68,6 @@ void	print_byte_as_binary(char c)
 
 static void end_of_message(pid_t source_pid)
 {
-	usleep(100);
 	ft_printf("\n");
 	send_char(source_pid, 0xFF);
 	global_pid = 0;
@@ -84,10 +80,6 @@ static void byte_handler(unsigned char byte)
 	static int	char_width;
 	static int	byte_number;
 	static pid_t	source_pid;
-
-	// ft_printf("Incoming byte: ");
-	// print_byte_as_binary(byte);
-	// ft_printf("\n");
 
 	if (byte_number == 0)
 	{
@@ -164,7 +156,6 @@ static void byte_handler(unsigned char byte)
 		if (buff_i == char_width)
 		{
 			ft_printf("%s", char_buff);
-			ft_printf("\n");
 			while(buff_i > 0)
 			{
 				buff_i--;
@@ -193,23 +184,21 @@ static void	signal_handler(int sig)
 	bit_received_count++;
 	if (global_pid != 0)
 	{
-		if (bit_received_count == 1)
-			ft_printf("sending a skip signal to pid %i: .", global_pid);
-		else if (bit_received_count == 8)
-			ft_printf(".\n");
-		else
-			ft_printf(".");
+		// if (bit_received_count == 1)
+		// else if (bit_received_count == 8)
+		// 	ft_printf(".\n");
+		// else
+		// 	ft_printf(".");
 		
-		usleep(1000);
 		kill(global_pid, SIGUSR2);
 	}
 	
 	if (bit_received_count == 8)
 	{
 		byte_handler(byte);
-		ft_printf("byte received. Byte is:");
-		print_byte_as_binary(byte);
-		ft_printf("\n");
+		// ft_printf("byte received. Byte is:");
+		// print_byte_as_binary(byte);
+		// ft_printf("\n");
 		bit_received_count = 0;
 		byte = 0x00;
 	}
