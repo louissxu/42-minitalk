@@ -12,12 +12,47 @@
 
 #include "server.h"
 
-// REMVOVE ME !!!!!!!
-#include <stdio.h>
-// REMVOVE ME !!!!!!!
-// REMVOVE ME !!!!!!!
-
 pid_t	global_pid = 0;
+
+int	send_char(pid_t target_pid, char c)
+{
+	char	bit;
+	int		bit_offset;
+
+	bit_offset = 0;
+	// ft_printf("Sending byte: <0b");
+	while (bit_offset < 8)
+	{
+		bit = (c >> (7 - bit_offset)) & 1;
+		if (bit == 1)
+		{
+			kill(target_pid, SIGUSR1);
+		}
+		else
+		{
+			kill(target_pid, SIGUSR2);
+		}
+		// ft_printf("%i", (int)bit);
+		bit_offset++;
+		usleep(5000);
+	}
+	// ft_printf(">\n");
+	target_pid++;
+	return (0);
+}
+
+int	send_string(pid_t target_pid, char *str)
+{
+	size_t	i;
+
+	i = 0;
+	while (str[i])
+	{
+		send_char(target_pid, (int)str[i]);
+		i++;
+	}
+	return (0);
+}
 
 void	print_byte_as_binary(char c)
 {
@@ -39,6 +74,7 @@ static void end_of_message(pid_t source_pid)
 	usleep(100);
 	ft_printf("\n");
 	send_char(source_pid, 0xFF);
+	global_pid = 0;
 }
 
 static void byte_handler(unsigned char byte)
@@ -70,8 +106,8 @@ static void byte_handler(unsigned char byte)
 		if (byte_number == 4)
 		{
 			ft_printf("> Incoming message from PID: %i\n", source_pid);
+			global_pid = source_pid;
 		}
-		global_pid = source_pid;
 		byte_number++;
 		return ;
 	}
@@ -128,13 +164,13 @@ static void byte_handler(unsigned char byte)
 		if (buff_i == char_width)
 		{
 			ft_printf("%s", char_buff);
+			ft_printf("\n");
 			while(buff_i > 0)
 			{
 				buff_i--;
 				char_buff[buff_i] = 0;
 			}
 			char_width = 0;
-			global_pid = 0;
 		}
 	}
 
@@ -157,12 +193,23 @@ static void	signal_handler(int sig)
 	bit_received_count++;
 	if (global_pid != 0)
 	{
+		if (bit_received_count == 1)
+			ft_printf("sending a skip signal to pid %i: .", global_pid);
+		else if (bit_received_count == 8)
+			ft_printf(".\n");
+		else
+			ft_printf(".");
+		
+		usleep(1000);
 		kill(global_pid, SIGUSR2);
 	}
 	
 	if (bit_received_count == 8)
 	{
 		byte_handler(byte);
+		ft_printf("byte received. Byte is:");
+		print_byte_as_binary(byte);
+		ft_printf("\n");
 		bit_received_count = 0;
 		byte = 0x00;
 	}

@@ -32,7 +32,8 @@ int	send_char(pid_t target_pid, char c)
 		}
 		// ft_printf("%i", (int)bit);
 		bit_offset++;
-		usleep(100000);
+		usleep(10000);
+		usleep(1000);
 	}
 	// ft_printf(">\n");
 	target_pid++;

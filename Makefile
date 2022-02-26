@@ -5,11 +5,11 @@ all: server client
 
 A = Fix makefile not recompiling helpers
 
-server: server.o helpers.o libft
+server: server.o libft
 	@echo "Compiling server.o"
 	$(CC) $(CFLAGS) -I . -L libft -lft $< -o $@ 
 
-client: client.o helpers.o libft
+client: client.o libft
 	@echo "Compiling client.o"
 	$(CC) $(CFLAGS) -I . -L libft -lft $< -o $@
 
