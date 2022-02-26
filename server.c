@@ -68,8 +68,10 @@ void	print_byte_as_binary(char c)
 
 static void end_of_message(pid_t source_pid)
 {
-	ft_printf("\n> --- END OF MESSAGE ----\n");
-	ft_printf("> Waiting for message...\n");
+	// ft_printf("\n> --- END OF MESSAGE ----\n");
+	// ft_printf("> Waiting for message...\n");
+	ft_printf("\n");
+	ft_printf("> ");
 	send_char(source_pid, 0xFF);
 	global_pid = 0;
 }
@@ -100,8 +102,9 @@ static void byte_handler(unsigned char byte)
 		source_pid = source_pid | byte;
 		if (byte_number == 4)
 		{
-			ft_printf("> -- INCOMING MESSAGE ---\n");
-			ft_printf("> Client PID: %i\n", source_pid);
+			// ft_printf("> -- INCOMING MESSAGE ---\n");
+			ft_printf("%-10i | ", source_pid);
+			// ft_printf("> Client PID: %i\n", source_pid);
 			global_pid = source_pid;
 		}
 		byte_number++;
@@ -221,11 +224,13 @@ int	main(void)
 	pid_t	pid;
 
 	pid = getpid();
-	ft_printf("---- Minitalk Server ----\n");
-	ft_printf("| Server is running     |\n");
-	ft_printf("| Server PID is: %-5d  |\n", pid);
-	ft_printf("-------------------------\n");
-	ft_printf("> Waiting for message...\n");
+	ft_printf("------ Minitalk Server ------\n");
+	ft_printf("| Server is running         |\n");
+	ft_printf("| Server PID is: %-10d |\n", pid);
+	ft_printf("-----------------------------\n");
+	ft_printf("> Listening for messages...\n");
+	ft_printf("| Source PID | Message -----|\n");
+	ft_printf("> ");
 	signal(SIGUSR1, signal_handler);
 	signal(SIGUSR2, signal_handler);
 	while (1)
