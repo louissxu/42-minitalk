@@ -223,7 +223,7 @@ int	main(void)
 	pid = getpid();
 	ft_printf("---- Minitalk Server ----\n");
 	ft_printf("| Server is running     |\n");
-	ft_printf("| PID is: %-10d    |\n", pid);
+	ft_printf("| Server PID is: %-5d  |\n", pid);
 	ft_printf("-------------------------\n");
 	ft_printf("> Waiting for message...\n");
 	signal(SIGUSR1, signal_handler);
