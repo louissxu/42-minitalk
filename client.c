@@ -12,70 +12,11 @@
 
 #include "client.h"
 
-int	send_char(pid_t target_pid, char c)
-{
-	char	bit;
-	int		bit_offset;
-
-	bit_offset = 0;
-	// ft_printf("Sending byte: <0b");
-	while (bit_offset < 8)
-	{
-		bit = (c >> (7 - bit_offset)) & 1;
-		if (bit == 1)
-		{
-			kill(target_pid, SIGUSR1);
-		}
-		else
-		{
-			kill(target_pid, SIGUSR2);
-		}
-		// ft_printf("%i", (int)bit);
-		bit_offset++;
-		usleep(10000);
-		usleep(100);
-	}
-	// ft_printf(">\n");
-	target_pid++;
-	return (0);
-}
-
-int	send_string(pid_t target_pid, char *str)
-{
-	size_t	i;
-
-	i = 0;
-	while (str[i])
-	{
-		send_char(target_pid, (int)str[i]);
-		i++;
-	}
-	return (0);
-}
-
-
-// Ref: Converting int to bytes https://stackoverflow.com/a/3784478/9160572
-static int	send_message(pid_t source_pid, pid_t target_pid, char *str)
-{
-	send_char(target_pid, 0x00);
-	
-	send_char(target_pid, (source_pid >> 24) & 0xFF);
-	send_char(target_pid, (source_pid >> 16) & 0xFF);
-	send_char(target_pid, (source_pid >> 8) & 0xFF);
-	send_char(target_pid, source_pid & 0xFF);
-
-	send_string(target_pid, str);
-	send_char(target_pid, 0xFF);
-	send_char(target_pid, 0xFF);
-
-	return (0);
-}
-
-static void byte_handler(unsigned char byte)
+static void	byte_handler(unsigned char byte)
 {
 	if (byte == 0xFF)
 	{
-		ft_printf("> Server confirms receipt of message\n");
+		ft_printf("> Message sent successfully\n");
 	}
 	exit(0);
 }
@@ -83,7 +24,7 @@ static void byte_handler(unsigned char byte)
 static void	signal_handler(int sig)
 {
 	static unsigned char	byte;
-	static int	bit_received_count;
+	static int				bit_received_count;
 
 	if (sig == SIGUSR1)
 	{
@@ -92,7 +33,6 @@ static void	signal_handler(int sig)
 	}
 	else if (sig == SIGUSR2)
 	{
-		// byte = (byte << 1) | 0x00;
 		byte = 0x00;
 		bit_received_count = 0;
 	}
@@ -103,6 +43,18 @@ static void	signal_handler(int sig)
 		byte = 0x00;
 	}
 	return ;
+}
+
+static void	write_client_display(pid_t client_pid, pid_t target_pid, char *str)
+{
+	ft_printf("------ Minitalk Client ------\n");
+	ft_printf("| Client PID is: %-10d |\n", client_pid);
+	ft_printf("| Target PID is: %-10d |\n", target_pid);
+	ft_printf("-----------------------------\n");
+	ft_printf("> Sending message...\n");
+	ft_printf("| Target PID | Message -----|\n");
+	ft_printf("> %-10i | %s\n", target_pid, str);
+	ft_printf("> Waiting for server ack...\n");
 }
 
 int	main(int argc, char **argv)
@@ -122,23 +74,11 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	client_pid = getpid();
-
-	ft_printf("------ Minitalk Client ------\n");
-	ft_printf("| Client PID is: %-10d |\n", client_pid);
-	ft_printf("| Target PID is: %-10d |\n", target_pid);
-	ft_printf("-----------------------------\n");
-	ft_printf("> Sending message...\n");
-	ft_printf("| Target PID | Message -----|\n");
-	ft_printf("> %-10i | %s\n", target_pid, argv[2]);
-
 	signal(SIGUSR1, signal_handler);
 	signal(SIGUSR2, signal_handler);
-
-	ft_printf("> Waiting for acknowledgement from server...\n");
+	write_client_display(client_pid, target_pid, argv[2]);
 	send_message(client_pid, target_pid, argv[2]);
-	
 	sleep(1);
-	ft_printf("> NO SERVER RESPONSE RECEIVED. LIKELY MESSAGE FAILURE\n");
-	//ft_printf("Message sent.\n");
+	ft_printf("> NO SERVER RESPONSE RECEIVED\n> LIKELY MESSAGE FAILURE\n");
 	return (1);
 }

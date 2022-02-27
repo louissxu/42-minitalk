@@ -14,7 +14,8 @@
 # define CLIENT_H
 
 # include "libft/includes/libft.h"
-
 # include <signal.h>
+
+int	send_message(pid_t source_pid, pid_t target_pid, char *str);
 
 #endif

@@ -18,4 +18,7 @@
 # include <unistd.h>
 # include <signal.h>
 
+void	end_of_message(pid_t g_source_pid);
+void	signal_handler(int sig);
+
 #endif
